@@ -1,12 +1,13 @@
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
-const itemroute = require("./routes/ItemRoute");
+const PostRoute = require("./Routes/PostRoute");
+const UserRoute = require("./Routes/UserRoute")
 require("dotenv").config();
 
 //MongoDB connection
 //change <appname> to a new mongo database
-mongoose.connect("mongodb://localhost/<appname>", {
+mongoose.connect("mongodb://localhost/aiesec", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -14,7 +15,8 @@ const db = mongoose.connection;
 
 //Middleware
 app.use(express.json());
-app.use("/api/item", itemroute);
+app.use("/api/post", PostRoute);
+app.use("/api/user", UserRoute);
 
 //Once db connects start server
 db.on("error", console.error.bind(console, "db conneciton error"));
