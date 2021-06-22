@@ -24,15 +24,27 @@ router.post("/", async (req, res) => {
     category: req.body.category,
     imgLink: req.body.imgLink,
   };
-  console.log(`recieved input: ${post}`);
+  console.log(post);
   const newPost = new Post(post);
   if (!newPost) res.status(400).send("bad request");
   await newPost.save((err) => {
     if (err) {
       console.log(err);
-      res.status(400).send("couldnt save to db");
+      res.status(400).send("couldnt save to db"+err);
     }
     res.send("Post saved");
+  });
+});
+
+//get by category
+router.get("/post/:category", async (req, response) => {
+  const cat = req.params.category
+  console.log(cat)
+  await Post.find({category:cat}, (err, res) => {
+    if (err || !res) {
+      return response.send("no data found" + err).status(404);
+    }
+    return response.send(res).status(200);
   });
 });
 
@@ -45,6 +57,8 @@ router.get("/:id", async (req, response) => {
     return response.send(res).status(200);
   });
 });
+
+
 
 //delete one
 router.get("/delete/:id", async (req, response) => {

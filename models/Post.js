@@ -12,9 +12,9 @@ const Schema = new mongoose.Schema({
     required:true
   },
   category:{
-    enum:["cat1","cat2","cat3"],
+    enum:["volunteer","teacher","intern"],
     type:String,
-    default:"cat1",
+    default:"volunteer",
     required:true
   },
   imgLink:{
