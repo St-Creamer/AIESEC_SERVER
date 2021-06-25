@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Post = require("../models/Post");
+const cors = require("cors");
 
 //Post Routes
 //get all
@@ -35,6 +36,8 @@ router.post("/", async (req, res) => {
     res.send("Post saved");
   });
 });
+
+var corsOptions = {origin: 'http://localhost/8000'}
 
 //get by category
 router.get("/post/:category", async (req, response) => {

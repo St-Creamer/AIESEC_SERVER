@@ -3,7 +3,8 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const Joi = require("joi");
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
+const { valid } = require("joi");
 
 router.post("/login", async (req, res) => {
   //get input
@@ -16,18 +17,18 @@ router.post("/login", async (req, res) => {
     bcrypt.compare(credentials.password, doc.password, (err, result) => {
       if (err) return res.send(err);
       if (result) {
-        //sign JWT if everything matches 
+        //sign JWT if everything matches
         const accessToken = jwt.sign(
-            { id: doc._id, role: doc.role },
-            `${process.env.JWT_SECRET_KEY}`
-          );
-          //send
-          res.cookie("AuthCookie",accessToken,{
-            expires: new Date(Date.now()+ 900000),
-            httpOnly : true,
-            signed : true
-          })
-          res.send(`welcome ${doc.name}`);
+          { id: doc._id, role: doc.role },
+          `${process.env.JWT_SECRET_KEY}`
+        );
+        //send
+        res.cookie("AuthCookie", accessToken, {
+          expires: new Date(Date.now() + 900000),
+          httpOnly: true,
+          signed: true,
+        });
+        res.send(`welcome ${doc.name}`);
       } else {
         return res.send("password or email dont match");
       }
@@ -37,15 +38,11 @@ router.post("/login", async (req, res) => {
 
 //validation schema
 const schema = Joi.object({
-  name: Joi.string()
-    .min(6)
-    .required()
-    .error(() => {
-      return { message: "name required" };
-    }),
+  name: Joi.string().min(6).required(),
   email: Joi.string().min(6).required().email(),
   password: Joi.string().min(8).required(),
-  role: Joi.string().valid("Dev", "Tester", "Manager", "Admin"),
+  repeat_password: Joi.ref("password"),
+  role: Joi.string().valid("Super", "Admin", "Guest"),
 });
 
 //create
@@ -59,9 +56,11 @@ router.post("/signup", async (req, res) => {
     role: req.body.role,
   };
   //check for validation
+  console.log(user)
   const validation = schema.validate(user);
+  console.log(validation);
   if (validation.error) {
-    return res.status(401).send(validation.error.details[0].message);
+    return res.status(401).send(validation.error);
   }
   const newUser = new User(user);
   //check if user exists
@@ -69,13 +68,13 @@ router.post("/signup", async (req, res) => {
   if (search) {
     return res.status(422).send("email already exists");
   }
-  //if doesnt exist we save
-  await newUser.save((err) => {
-    if (err) {
-      return res.send(err);
-    }
-  });
-  return res.status(200).send("User saved");
+  try {
+    //if doesnt exist we save
+    await newUser.save();
+    return res.status(200).send("User saved");
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 module.exports = router;

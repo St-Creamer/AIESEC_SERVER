@@ -26,7 +26,7 @@ const schema = new mongoose.Schema({
   },
   role: {
     enum: ["Super", "Admin", "Guest"],
-    default: "Su[er", // change this later after testing
+    default: "Guest", // change this later after testing
     type: String,
   }
 });
