@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const mongoose = require("mongoose");
+const cookieParser = require('cookie-parser');
 const bodyParser = require("body-parser");
 const PostRoute = require("./Routes/PostRoute");
 const UserRoute = require("./Routes/UserRoute");
@@ -12,6 +13,7 @@ const uri =process.env.URI;
 
   
 //Middleware
+app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(cors({origin:"http://localhost"}))
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));

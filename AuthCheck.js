@@ -1,16 +1,19 @@
 const JWT = require("jsonwebtoken");
+cookieParser = require('cookie-parser');
 
 const isLoggedIn = (req, res, next) => {
-  //get token from signed cookies
   let token = req.signedCookies.AuthCookie;
-  if (!token) return res.status(403).send("protected route");
+  console.log(req.signedCookies);
+  if(token == undefined){
+    return res.send(JSON.stringify({msg:"protected route"}));
+  }
+  
   JWT.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
     if (err) {
       return res.send(err);
     }
-    //im not sure if i should attach the payload to req
-    // req.payload = JWT.decode(token, { json: true });
-    // console.log(req.payload);
+    req.currentUser = JWT.decode(token, { json: true });
+    console.log(req.currentUser)
   });
   next();
 };

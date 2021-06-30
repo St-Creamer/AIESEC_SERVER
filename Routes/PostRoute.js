@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Post = require("../models/Post");
 const cors = require("cors");
+const isLoggedIn = require("../AuthCheck");
 
 //Post Routes
 //get all
@@ -37,17 +38,16 @@ router.post("/", async (req, res) => {
   });
 });
 
-var corsOptions = {origin: 'http://localhost/8000'}
 
 //get by category
-router.get("/post/:category", async (req, response) => {
+router.get("/post/:category", isLoggedIn ,async (req, response) => {
   const cat = req.params.category
   console.log(cat)
   await Post.find({category:cat}, (err, res) => {
     if (err || !res) {
-      return response.send("no data found" + err).status(404);
+      return response.send("no data found" + err)
     }
-    return response.send(res).status(200);
+    return response.send(res)
   });
 });
 

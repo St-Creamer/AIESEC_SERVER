@@ -4,7 +4,6 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const Joi = require("joi");
 const jwt = require("jsonwebtoken");
-const { valid } = require("joi");
 
 router.post("/login", async (req, res) => {
   //get input
@@ -23,12 +22,15 @@ router.post("/login", async (req, res) => {
           `${process.env.JWT_SECRET_KEY}`
         );
         //send
+        res.cookie("Me",doc.role)
+        console.log(doc)
         res.cookie("AuthCookie", accessToken, {
           expires: new Date(Date.now() + 900000),
-          httpOnly: true,
-          signed: true,
+          httpOnly: false, //change this later
+          signed:true
         });
-        res.send(`welcome ${doc.name}`);
+        console.log(req.signedCookies)
+        res.send(JSON.stringify({msg:`welcome back ${doc.name}`}));
       } else {
         return res.send("password or email dont match");
       }
