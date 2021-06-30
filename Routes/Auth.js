@@ -4,6 +4,8 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const Joi = require("joi");
 const jwt = require("jsonwebtoken");
+const isLoggedIn = require("../AuthCheck");
+const { json } = require("body-parser");
 
 router.post("/login", async (req, res) => {
   //get input
@@ -22,14 +24,14 @@ router.post("/login", async (req, res) => {
           `${process.env.JWT_SECRET_KEY}`
         );
         //send
-        res.cookie("Me",doc.role)
+        res.cookie("role",doc.role)
+        res.cookie("id",doc._id.toString())
         console.log(doc)
         res.cookie("AuthCookie", accessToken, {
           expires: new Date(Date.now() + 900000),
           httpOnly: false, //change this later
           signed:true
         });
-        console.log(req.signedCookies)
         res.send(JSON.stringify({msg:`welcome back ${doc.name}`}));
       } else {
         return res.send("password or email dont match");
@@ -78,5 +80,14 @@ router.post("/signup", async (req, res) => {
     console.log(err);
   }
 });
+
+router.get("/logout",isLoggedIn,(req,res)=>{
+  res.cookie("AuthCookie", {
+    expires: "Thu, 01 Jan 1970 00:00:01 GMT;",
+    httpOnly: false, //change this later
+    signed:true
+  });
+  res.send(JSON.stringify({msg:"you have been logged out"}))
+})
 
 module.exports = router;

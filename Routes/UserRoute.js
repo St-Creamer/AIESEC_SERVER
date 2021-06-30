@@ -31,6 +31,25 @@ router.get("/",async (req, res) => {
   }
 });
 
+//get current user
+router.post("/me",isLoggedIn,async (req,res)=>{
+  try {
+    await User.findById(req.body.id).then((data) => {
+        console.log(data)
+        let info = {
+          role: data.role,
+          name: data.name,
+          email:data.email
+        }
+        return res.send(info);
+    });
+    } catch (err) {
+    console.log(err);
+    return res.status(404).send("no data or bad request \n" + err);
+}
+})
+
+
 //get one
 router.get("/:id", async (req, res) => {
     try {
@@ -78,5 +97,6 @@ router.put("/:id", async (req, response) => {
     return response.status(200).send("document updated");
   });
 });
+
 
 module.exports = router;

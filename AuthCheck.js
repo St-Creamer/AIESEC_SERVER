@@ -12,8 +12,8 @@ const isLoggedIn = (req, res, next) => {
     if (err) {
       return res.send(err);
     }
-    req.currentUser = JWT.decode(token, { json: true });
-    console.log(req.currentUser)
+    res.locals.currentUser = JWT.decode(token, { json: true });
+    console.log(res.locals)
   });
   next();
 };
